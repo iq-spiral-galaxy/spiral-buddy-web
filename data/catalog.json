@@ -1,0 +1,366 @@
+{
+  "organization": "iq-dev-lab",
+  "domains": [
+    {
+      "id": "common",
+      "name": "공통 기반",
+      "englishName": "Common Core",
+      "description": "직군을 넘어 반복해서 쓰이는 시스템, 설계, 품질, 개발 기본기를 한곳에 모았습니다.",
+      "color": "#315ee7",
+      "categories": [
+        {
+          "id": "computer-systems",
+          "name": "컴퓨터 시스템",
+          "description": "코드 아래에서 실제로 움직이는 하드웨어, 컴파일러, 분산 시스템의 원리",
+          "repos": [
+            "computer-architecture-deep-dive",
+            "compiler-deep-dive",
+            "cryptography-deep-dive",
+            "distributed-systems-theory-deep-dive",
+            "gpu-graphics-deep-dive"
+          ]
+        },
+        {
+          "id": "engineering-fundamentals",
+          "name": "개발 기본기",
+          "description": "플랫폼이 달라져도 그대로 남는 협업, 네트워크, 테스트의 기초",
+          "repos": [
+            "git-in-depth",
+            "network-deep-dive",
+            "unit-testing"
+          ]
+        },
+        {
+          "id": "architecture-quality",
+          "name": "설계와 품질",
+          "description": "좋은 구조를 만들고 안전성과 성능을 검증하는 공통 관점",
+          "repos": [
+            "architecture-patterns-deep-dive",
+            "system-design-deep-dive",
+            "security-engineering-deep-dive",
+            "performance-testing-deep-dive"
+          ]
+        },
+        {
+          "id": "languages-runtimes",
+          "name": "언어와 런타임",
+          "description": "특정 제품 영역에 묶이지 않는 언어와 실행 모델",
+          "repos": [
+            "rust-deep-dive",
+            "go-deep-dive"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "frontend",
+      "name": "Frontend",
+      "englishName": "Web Client",
+      "description": "브라우저 엔진부터 React, 렌더링, 상태 관리, 성능까지 웹 클라이언트의 전체 층을 다룹니다.",
+      "color": "#0b8da4",
+      "categories": [
+        {
+          "id": "web-platform-engine",
+          "name": "Web Platform & Engine",
+          "description": "브라우저가 JavaScript와 화면을 실행하고 그리는 방식",
+          "repos": [
+            "browser-rendering-deep-dive",
+            "v8-engine-deep-dive",
+            "event-loop-async-deep-dive",
+            "web-apis-wasm-deep-dive"
+          ]
+        },
+        {
+          "id": "language-types",
+          "name": "Language & Type System",
+          "description": "JavaScript의 동작과 TypeScript 타입 시스템",
+          "repos": [
+            "javascript-deep-dive",
+            "typescript-type-system-deep-dive"
+          ]
+        },
+        {
+          "id": "ui-rendering-state",
+          "name": "UI, Rendering & State",
+          "description": "컴포넌트, 상태, CSS가 사용자 화면으로 이어지는 과정",
+          "repos": [
+            "react-internals-deep-dive",
+            "frontend-state-management-deep-dive",
+            "rendering-strategy-deep-dive",
+            "css-engine-layout-deep-dive"
+          ]
+        },
+        {
+          "id": "tooling-performance-networking",
+          "name": "Tooling, Performance & Networking",
+          "description": "빌드 파이프라인, 웹 성능, 실시간 클라이언트 통신",
+          "repos": [
+            "frontend-build-tools-deep-dive",
+            "web-performance-deep-dive",
+            "realtime-client-networking-deep-dive"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "backend",
+      "name": "Backend",
+      "englishName": "Server Side",
+      "description": "Java와 Spring을 중심으로 도메인 설계, 분산 아키텍처, 서버 API를 깊게 공부합니다.",
+      "color": "#6a5acd",
+      "categories": [
+        {
+          "id": "java-jvm",
+          "name": "Java & JVM",
+          "description": "Java 언어, API, 동시성과 JVM 실행 원리",
+          "repos": [
+            "modern-java-in-action",
+            "java-api-reference",
+            "java-design-patterns",
+            "java-concurrency-deep-dive",
+            "jvm-deep-dive"
+          ]
+        },
+        {
+          "id": "spring",
+          "name": "Spring Ecosystem",
+          "description": "Spring Core에서 Data, Security, Cloud, WebFlux까지",
+          "repos": [
+            "spring-core-deep-dive",
+            "spring-data-transaction",
+            "spring-boot-internals",
+            "spring-mvc-deep-dive",
+            "spring-security-deep-dive",
+            "spring-batch-deep-dive",
+            "spring-cloud-deep-dive",
+            "spring-webflux-deep-dive"
+          ]
+        },
+        {
+          "id": "distributed-architecture",
+          "name": "Distributed Architecture",
+          "description": "도메인 경계와 이벤트, 마이크로서비스를 설계하는 방법",
+          "repos": [
+            "ddd-deep-dive",
+            "cqrs-event-sourcing-deep-dive",
+            "msa-deep-dive"
+          ]
+        },
+        {
+          "id": "server-api",
+          "name": "API & Communication",
+          "description": "서비스 사이의 계약과 고성능 통신",
+          "repos": [
+            "grpc-deep-dive"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "android",
+      "name": "Android",
+      "englishName": "Android Client",
+      "description": "Android 런타임과 프레임워크, Kotlin, Compose, 앱 구조와 빌드 성능을 나눠 살펴봅니다.",
+      "color": "#218c68",
+      "categories": [
+        {
+          "id": "android-platform-runtime",
+          "name": "Platform & Runtime",
+          "description": "Android OS 위에서 앱이 실행되는 내부 구조",
+          "repos": [
+            "android-runtime-deep-dive",
+            "android-framework-internals-deep-dive"
+          ]
+        },
+        {
+          "id": "android-language-ui",
+          "name": "Language & UI",
+          "description": "Kotlin 언어와 Jetpack Compose의 UI 모델",
+          "repos": [
+            "kotlin-deep-dive",
+            "jetpack-compose-internals-deep-dive"
+          ]
+        },
+        {
+          "id": "android-architecture",
+          "name": "App Architecture",
+          "description": "수명주기와 상태 변화를 견디는 Android 앱 구조",
+          "repos": [
+            "android-architecture-deep-dive"
+          ]
+        },
+        {
+          "id": "android-performance-build",
+          "name": "Performance & Build",
+          "description": "사용자 체감 성능과 Android 빌드 시스템",
+          "repos": [
+            "android-performance-deep-dive",
+            "android-build-system-deep-dive"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ios",
+      "name": "iOS",
+      "englishName": "Apple Client",
+      "description": "Swift와 Objective-C 런타임부터 앱 생명주기, UI 프레임워크, 동시성과 성능까지 정리합니다.",
+      "color": "#cf5c74",
+      "categories": [
+        {
+          "id": "ios-language-runtime",
+          "name": "Language & Runtime",
+          "description": "Swift 언어와 Objective-C 런타임의 핵심",
+          "repos": [
+            "swift-deep-dive",
+            "objc-runtime-deep-dive"
+          ]
+        },
+        {
+          "id": "ios-lifecycle-concurrency",
+          "name": "Lifecycle & Concurrency",
+          "description": "RunLoop, 앱 수명주기, Swift 동시성 모델",
+          "repos": [
+            "ios-lifecycle-runloop-deep-dive",
+            "swift-concurrency-deep-dive"
+          ]
+        },
+        {
+          "id": "ios-ui-rendering",
+          "name": "UI & Rendering",
+          "description": "SwiftUI와 UIKit/Core Animation의 렌더링 구조",
+          "repos": [
+            "swiftui-internals-deep-dive",
+            "uikit-core-animation-deep-dive"
+          ]
+        },
+        {
+          "id": "ios-performance",
+          "name": "Performance",
+          "description": "iOS 앱의 응답성, 메모리, 렌더링 성능",
+          "repos": [
+            "ios-performance-deep-dive"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cross-platform",
+      "name": "Cross Platform",
+      "englishName": "Shared Client",
+      "description": "하나의 코드와 아키텍처를 여러 플랫폼으로 확장할 때 필요한 프레임워크와 동기화를 다룹니다.",
+      "color": "#d97831",
+      "categories": [
+        {
+          "id": "cross-frameworks",
+          "name": "Frameworks",
+          "description": "React Native, Flutter, Kotlin Multiplatform의 실행 구조",
+          "repos": [
+            "react-native-deep-dive",
+            "flutter-deep-dive",
+            "kotlin-multiplatform-deep-dive"
+          ]
+        },
+        {
+          "id": "shared-app-architecture",
+          "name": "Shared App Architecture",
+          "description": "플랫폼에 종속되지 않는 로컬 우선 데이터와 동기화",
+          "repos": [
+            "local-first-sync-deep-dive"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "data-infrastructure",
+      "name": "Data & Infrastructure",
+      "englishName": "Platform & Data",
+      "description": "Backend에서 분리한 운영 플랫폼, 데이터 저장소, 메시징, 데이터 처리 영역을 독립적으로 탐색합니다.",
+      "color": "#88702d",
+      "categories": [
+        {
+          "id": "platform-devops",
+          "name": "Platform & DevOps",
+          "description": "Linux, 컨테이너, 오케스트레이션, 관측성과 배포 자동화",
+          "repos": [
+            "linux-for-backend-deep-dive",
+            "docker-deep-dive",
+            "kubernetes-deep-dive",
+            "observability-deep-dive",
+            "cicd-deep-dive",
+            "iac-deep-dive",
+            "service-mesh-deep-dive"
+          ]
+        },
+        {
+          "id": "database-search",
+          "name": "Database & Search",
+          "description": "관계형 데이터베이스, 캐시, 검색 엔진과 마이그레이션",
+          "repos": [
+            "database-internals",
+            "mysql-deep-dive",
+            "postgresql-deep-dive",
+            "redis-deep-dive",
+            "elasticsearch-deep-dive",
+            "db-migration-deep-dive"
+          ]
+        },
+        {
+          "id": "messaging-streaming",
+          "name": "Messaging & Streaming",
+          "description": "비동기 메시지와 이벤트 스트림을 전달하는 기반",
+          "repos": [
+            "kafka-deep-dive",
+            "rabbitmq-deep-dive"
+          ]
+        },
+        {
+          "id": "data-engineering",
+          "name": "Data Engineering",
+          "description": "대규모 데이터 처리와 컬럼형 저장 포맷",
+          "repos": [
+            "spark-internals-deep-dive",
+            "stream-processing-deep-dive",
+            "columnar-storage-format-deep-dive"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "synthesis",
+      "name": "Synthesis",
+      "englishName": "Cross-domain Models",
+      "description": "플랫폼별 지식을 공통 모델로 다시 연결해 차이보다 반복되는 원리를 발견합니다.",
+      "color": "#9954a7",
+      "categories": [
+        {
+          "id": "runtime-compilation-models",
+          "name": "Runtime & Compilation Models",
+          "description": "동시성, 메모리, 컴파일 전략을 언어와 플랫폼 사이에서 비교",
+          "repos": [
+            "concurrency-models-compared",
+            "memory-management-compared",
+            "compilation-strategies-compared"
+          ]
+        },
+        {
+          "id": "ui-state-models",
+          "name": "UI & State Models",
+          "description": "서로 다른 UI 렌더링과 반응성 모델의 공통 구조",
+          "repos": [
+            "rendering-pipelines-compared",
+            "reactivity-state-compared"
+          ]
+        },
+        {
+          "id": "caching-memory-models",
+          "name": "Caching & Memory Hierarchy",
+          "description": "계층마다 반복되는 캐시와 메모리의 원리",
+          "repos": [
+            "caching-memory-hierarchy-compared"
+          ]
+        }
+      ]
+    }
+  ]
+}

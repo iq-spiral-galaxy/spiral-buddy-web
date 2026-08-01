@@ -39,7 +39,13 @@ export async function POST(request: Request) {
     );
   }
 
-  let payload: { topic?: unknown; depth?: unknown; messages?: unknown };
+  let payload: {
+    topic?: unknown;
+    depth?: unknown;
+    sourceTitle?: unknown;
+    source?: unknown;
+    messages?: unknown;
+  };
   try {
     payload = await request.json();
   } catch {
@@ -62,6 +68,11 @@ export async function POST(request: Request) {
 
   const topic = typeof payload.topic === "string" ? payload.topic.slice(0, 160) : "자유 주제";
   const depth = typeof payload.depth === "string" ? payload.depth.slice(0, 40) : "첫 이해";
+  const sourceTitle = typeof payload.sourceTitle === "string" ? payload.sourceTitle.slice(0, 180) : "";
+  const source = typeof payload.source === "string" ? payload.source.slice(0, 28_000) : "";
+  const sourceContext = source
+    ? `\n\nTrusted curriculum source${sourceTitle ? ` (${sourceTitle})` : ""}:\n---\n${source}\n---\nUse this source as the primary learning context. Distinguish its claims from general knowledge, and never invent material that is not present.`
+    : "";
 
   const upstream = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
@@ -71,7 +82,7 @@ export async function POST(request: Request) {
     },
     body: JSON.stringify({
       model,
-      instructions: `${buddyInstructions}\n\nCurrent learning topic: ${topic}\nCurrent revisit depth: ${depth}`,
+      instructions: `${buddyInstructions}\n\nCurrent learning topic: ${topic}\nCurrent revisit depth: ${depth}${sourceContext}`,
       input: messages,
       max_output_tokens: 1400,
       store: false,
