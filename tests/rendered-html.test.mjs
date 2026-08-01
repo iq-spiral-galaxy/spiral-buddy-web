@@ -25,6 +25,7 @@ test("server-renders the Spiral Buddy learning experience", async () => {
   const html = await response.text();
   assert.match(html, /<title>Spiral Buddy/);
   assert.match(html, /코드에서 시스템까지/);
+  assert.doesNotMatch(html, /BLUE · TECHNE · SOFTWARE &amp; SYSTEMS/);
   assert.match(html, /Blue · Software &amp; Systems/);
   assert.match(html, /Red · AI &amp; Mathematics/);
   assert.match(html, /Green · Practical Wisdom/);

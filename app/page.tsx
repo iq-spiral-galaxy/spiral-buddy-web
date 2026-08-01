@@ -791,7 +791,6 @@ export default function Home() {
 
             <div className="catalog-intro">
               <div className="welcome-copy">
-                <p className="eyebrow">{selectedTrack.heroEyebrow}</p>
                 <h1>{selectedTrack.heroLead}<br /><span>{selectedTrack.heroAccent}</span></h1>
                 <p className="welcome-description">{selectedTrack.description}</p>
               </div>

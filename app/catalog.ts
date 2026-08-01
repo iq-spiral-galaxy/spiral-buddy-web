@@ -36,7 +36,6 @@ export type LearningTrack = {
   color: string;
   softColor: string;
   swatch: string;
-  heroEyebrow: string;
   heroLead: string;
   heroAccent: string;
   description: string;
