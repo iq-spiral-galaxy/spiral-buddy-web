@@ -1,0 +1,17 @@
+{
+  "id": "blue",
+  "name": "Blue",
+  "shortName": "BL",
+  "philosophy": "Techne",
+  "subject": "Software & Systems",
+  "koreanSubject": "개발과 시스템",
+  "organization": "iq-dev-lab",
+  "defaultBranch": "main",
+  "color": "#315ee7",
+  "softColor": "#e9efff",
+  "swatch": "#315ee7",
+  "heroEyebrow": "BLUE · TECHNE · SOFTWARE & SYSTEMS",
+  "heroLead": "코드에서 시스템까지,",
+  "heroAccent": "하나의 지도.",
+  "description": "공통 기반은 함께 묶고, Frontend·Backend·Android·iOS는 분명하게 나눴어요. 레포를 고르면 그 자리에서 Buddy와 학습을 시작할 수 있습니다."
+}

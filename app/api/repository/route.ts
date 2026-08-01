@@ -1,4 +1,4 @@
-import { catalogOrganization, findRepo, learningTitle } from "@/app/catalog";
+import { findRepo, learningTitle } from "@/app/catalog";
 
 type GitHubTreeEntry = {
   path?: string;
@@ -19,7 +19,6 @@ type CurriculumChapter = {
   items: CurriculumItem[];
 };
 
-const defaultBranch = "main";
 const markdownExtension = /\.md$/i;
 const readmeName = /(^|\/)readme\.md$/i;
 const naturalCollator = new Intl.Collator("en", { numeric: true, sensitivity: "base" });
@@ -54,6 +53,7 @@ function cleanDisplayTitle(value: string) {
     .replace(/^\s*\d+[.)]\s*/, "")
     .replace(/\bdeep\s+dive\b/gi, "")
     .replace(/\bcompared\b/gi, "")
+    .replace(/\bdistilled\b/gi, "")
     .replace(/\s{2,}/g, " ")
     .trim();
 }
@@ -152,18 +152,25 @@ function repositoryError(message: string, status: number) {
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
+  const trackId = url.searchParams.get("track")?.trim() || "blue";
   const repo = url.searchParams.get("repo")?.trim() ?? "";
   const contentPath = url.searchParams.get("path")?.trim();
+  const repoLocation = findRepo(repo, trackId);
 
-  if (!repo || !findRepo(repo)) {
+  if (!repo || !repoLocation) {
     return repositoryError("학습 카탈로그에 없는 레포예요.", 404);
   }
+
+  const { organization, defaultBranch } = repoLocation.track;
 
   if (contentPath) {
     if (
       !markdownExtension.test(contentPath) ||
       contentPath.includes("..") ||
       contentPath.startsWith("/") ||
+      contentPath.includes("\\") ||
+      /[\u0000-\u001f\u007f]/.test(contentPath) ||
+      contentPath.length > 600 ||
       readmeName.test(contentPath)
     ) {
       return repositoryError("올바른 학습 문서 경로가 아니에요.", 400);
@@ -171,7 +178,7 @@ export async function GET(request: Request) {
 
     const encodedPath = contentPath.split("/").map(encodeURIComponent).join("/");
     const sourceResponse = await fetch(
-      `https://raw.githubusercontent.com/${catalogOrganization}/${encodeURIComponent(repo)}/${defaultBranch}/${encodedPath}`,
+      `https://raw.githubusercontent.com/${organization}/${encodeURIComponent(repo)}/${defaultBranch}/${encodedPath}`,
     );
 
     if (!sourceResponse.ok) {
@@ -180,18 +187,18 @@ export async function GET(request: Request) {
 
     const content = (await sourceResponse.text()).slice(0, 40_000);
     return Response.json(
-      { repo, path: contentPath, title: learningTitle(contentPath), content },
+      { track: trackId, organization, repo, path: contentPath, title: learningTitle(contentPath), content },
       { headers: cacheHeaders(3600) },
     );
   }
 
   const [treeResponse, readmeResponse] = await Promise.all([
     fetch(
-      `https://api.github.com/repos/${catalogOrganization}/${encodeURIComponent(repo)}/git/trees/${defaultBranch}?recursive=1`,
+      `https://api.github.com/repos/${organization}/${encodeURIComponent(repo)}/git/trees/${defaultBranch}?recursive=1`,
       { headers: githubHeaders() },
     ),
     fetch(
-      `https://raw.githubusercontent.com/${catalogOrganization}/${encodeURIComponent(repo)}/${defaultBranch}/README.md`,
+      `https://raw.githubusercontent.com/${organization}/${encodeURIComponent(repo)}/${defaultBranch}/README.md`,
     ),
   ]);
 
@@ -218,6 +225,8 @@ export async function GET(request: Request) {
 
   return Response.json(
     {
+      track: trackId,
+      organization,
       repo,
       branch: defaultBranch,
       chapters,

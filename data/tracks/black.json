@@ -1,0 +1,153 @@
+{
+  "id": "black",
+  "name": "Black",
+  "shortName": "BK",
+  "philosophy": "Sophia",
+  "subject": "Physics & Reality",
+  "koreanSubject": "물리와 우주",
+  "organization": "iq-physis-lab",
+  "defaultBranch": "main",
+  "color": "#303541",
+  "softColor": "#eceef2",
+  "swatch": "#080a0f",
+  "heroEyebrow": "BLACK · SOPHIA · PHYSICS & REALITY",
+  "heroLead": "법칙에서 우주까지,",
+  "heroAccent": "제1원리로 연결.",
+  "description": "근사와 대칭의 언어에서 출발해 고전 세계, 열과 시간, 양자, 상대론과 양자중력의 최전선까지 물리적 실재를 추적합니다.",
+  "domains": [
+    {
+      "id": "language-of-physics",
+      "name": "Language of Physics",
+      "englishName": "L0 · FOUNDATIONAL LANGUAGE",
+      "description": "차원, 변분, 대칭, 근사와 측정으로 자연을 읽는 물리학자의 언어를 세웁니다.",
+      "color": "#A9823D",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Language of Physics",
+        "description": "물리학자의 모국어",
+        "repos": [
+          "dimensional-scaling-distilled",
+          "variational-principles-distilled",
+          "symmetry-conservation-distilled",
+          "approximation-perturbation-distilled",
+          "measurement-uncertainty-distilled"
+        ]
+      }]
+    },
+    {
+      "id": "classical-world",
+      "name": "Classical World",
+      "englishName": "L1 · MOTION, FIELDS & WAVES",
+      "description": "고전역학, 파동, 전자기장과 혼돈을 통해 결정론적 세계의 힘과 한계를 봅니다.",
+      "color": "#538A6B",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Classical World",
+        "description": "운동, 장과 파동의 세계",
+        "repos": [
+          "classical-mechanics-distilled",
+          "oscillations-waves-distilled",
+          "electromagnetism-distilled",
+          "chaos-distilled",
+          "classical-field-theory-distilled"
+        ]
+      }]
+    },
+    {
+      "id": "statistical-world",
+      "name": "Statistical World",
+      "englishName": "L2 · HEAT, ENTROPY & TIME",
+      "description": "열역학과 통계역학에서 거시 법칙, 상전이, 요동과 시간의 화살이 어떻게 창발하는지 봅니다.",
+      "color": "#A85E5A",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Statistical World",
+        "description": "열, 엔트로피와 시간의 창발",
+        "repos": [
+          "thermodynamics-distilled",
+          "statistical-mechanics-distilled",
+          "arrow-of-time-distilled",
+          "phase-transitions-distilled",
+          "fluctuations-information-distilled"
+        ]
+      }]
+    },
+    {
+      "id": "quantum-world",
+      "name": "Quantum World",
+      "englishName": "L3 · QUANTA, MATTER & FIELDS",
+      "description": "양자역학의 측정과 얽힘에서 장론, 표준모형, 양자물질과 양자정보까지 확장합니다.",
+      "color": "#5273AD",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Quantum World",
+        "description": "불연속, 중첩과 장의 세계",
+        "repos": [
+          "quantum-mechanics-distilled",
+          "entanglement-measurement-distilled",
+          "quantum-field-theory-distilled",
+          "standard-model-distilled",
+          "emergent-quantum-matter-distilled",
+          "quantum-information-distilled"
+        ]
+      }]
+    },
+    {
+      "id": "relativity-cosmos",
+      "name": "Relativity & Cosmos",
+      "englishName": "L4 · SPACETIME & GRAVITY",
+      "description": "특수·일반 상대론에서 블랙홀, 우주론과 천체물리까지 시공간과 중력을 큰 스케일에서 봅니다.",
+      "color": "#8563A5",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Relativity & Cosmos",
+        "description": "시공간, 중력과 우주",
+        "repos": [
+          "special-relativity-distilled",
+          "general-relativity-distilled",
+          "black-holes-distilled",
+          "cosmology-distilled",
+          "astrophysics-distilled"
+        ]
+      }]
+    },
+    {
+      "id": "frontier",
+      "name": "Frontier",
+      "englishName": "L5 · QUANTUM GRAVITY",
+      "description": "양자와 중력이 충돌하는 지점에서 끈이론, 루프 양자중력, 홀로그래피와 창발 시공간을 탐구합니다.",
+      "color": "#56828D",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Frontier",
+        "description": "양자중력의 연구 최전선",
+        "repos": [
+          "quantum-gravity-distilled",
+          "string-theory-distilled",
+          "loop-quantum-gravity-distilled",
+          "holographic-principle-distilled",
+          "emergent-spacetime-multiverse-distilled"
+        ]
+      }]
+    },
+    {
+      "id": "synthesis",
+      "name": "Synthesis",
+      "englishName": "L6 · CROSS-LAYER PRINCIPLES",
+      "description": "대칭, 최소작용, 엔트로피, 정보와 창발이 물리의 여러 층에서 반복되는 방식을 회수합니다.",
+      "color": "#995B7D",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Synthesis",
+        "description": "레이어를 가로지르는 물리의 본질",
+        "repos": [
+          "symmetry-everywhere",
+          "least-action-everywhere",
+          "entropy-time-everywhere",
+          "information-everywhere",
+          "emergence-distilled"
+        ]
+      }]
+    }
+  ]
+}

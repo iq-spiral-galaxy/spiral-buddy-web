@@ -1,0 +1,134 @@
+{
+  "id": "green",
+  "name": "Green",
+  "shortName": "GN",
+  "philosophy": "Phronesis",
+  "subject": "Practical Wisdom",
+  "koreanSubject": "실천적 지혜",
+  "organization": "iq-phronesis-lab",
+  "defaultBranch": "main",
+  "color": "#4d9271",
+  "softColor": "#eaf4ee",
+  "swatch": "#4d9a73",
+  "heroEyebrow": "GREEN · PHRONESIS · PRACTICAL WISDOM",
+  "heroLead": "판단에서 실행까지,",
+  "heroAccent": "원리로 연결.",
+  "description": "불확실한 상황에서 더 잘 판단하도록 사고 도구, 돈, 사람, 제도와 세계의 작동 원리를 실천 가능한 규칙으로 증류합니다.",
+  "domains": [
+    {
+      "id": "thinking-tools",
+      "name": "Thinking Tools",
+      "englishName": "L0 · JUDGMENT SYSTEM",
+      "description": "확률적 사고, 의사결정 이론, 멘탈 모델과 통계 감각으로 판단의 운영체제를 세웁니다.",
+      "color": "#82AD90",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Thinking Tools",
+        "description": "모든 판단의 출발점",
+        "repos": [
+          "probabilistic-thinking-distilled",
+          "decision-theory-distilled",
+          "mental-models-distilled",
+          "cognitive-bias-distilled",
+          "statistics-literacy-distilled"
+        ]
+      }]
+    },
+    {
+      "id": "money",
+      "name": "Money",
+      "englishName": "L1 · CAPITAL & MARKETS",
+      "description": "개인의 지갑에서 기업 가치, 거시 사이클과 시장까지 돈의 언어를 한 흐름으로 읽습니다.",
+      "color": "#B18D42",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Money",
+        "description": "개인에서 시장까지 이어지는 돈의 원리",
+        "repos": [
+          "money-and-interest-distilled",
+          "personal-finance-distilled",
+          "financial-statements-distilled",
+          "unit-economics-distilled",
+          "valuation-distilled",
+          "macro-cycles-distilled",
+          "markets-investing-distilled"
+        ]
+      }]
+    },
+    {
+      "id": "people",
+      "name": "People",
+      "englishName": "L2 · BEHAVIOR & COMMUNICATION",
+      "description": "설득, 포지셔닝, 성장, 가격, 카피와 협상을 사람을 움직이는 하나의 메커니즘으로 봅니다.",
+      "color": "#B86262",
+      "categories": [{
+        "id": "curriculum",
+        "name": "People",
+        "description": "사람을 이해하고 움직이는 법",
+        "repos": [
+          "persuasion-psychology-distilled",
+          "positioning-brand-distilled",
+          "funnel-growth-distilled",
+          "pricing-distilled",
+          "copy-narrative-distilled",
+          "negotiation-distilled"
+        ]
+      }]
+    },
+    {
+      "id": "rules-of-the-game",
+      "name": "Rules of the Game",
+      "englishName": "L3 · ECONOMICS & STRATEGY",
+      "description": "개인의 선택보다 결과를 크게 만드는 시장, 게임, 인센티브, 법과 전략의 구조를 읽습니다.",
+      "color": "#647FA9",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Rules of the Game",
+        "description": "게임의 구조와 규칙을 설계하는 관점",
+        "repos": [
+          "microeconomics-distilled",
+          "game-theory-distilled",
+          "incentive-design-distilled",
+          "law-for-founders-distilled",
+          "strategy-moats-distilled"
+        ]
+      }]
+    },
+    {
+      "id": "reading-the-world",
+      "name": "Reading the World",
+      "englishName": "L4 · HISTORY & SYSTEMS",
+      "description": "경제사, 기업의 흥망, 기술 확산과 지정학을 이론이 검증되는 실제 데이터로 읽습니다.",
+      "color": "#438D80",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Reading the World",
+        "description": "역사와 세계를 사례 데이터로 읽기",
+        "repos": [
+          "economic-history-distilled",
+          "corporate-rise-fall-distilled",
+          "tech-adoption-distilled",
+          "geopolitics-distilled"
+        ]
+      }]
+    },
+    {
+      "id": "synthesis",
+      "name": "Synthesis",
+      "englishName": "L5 · CROSS-LAYER PRINCIPLES",
+      "description": "인센티브, 복리, 피드백과 레버리지가 여러 분야에서 같은 구조로 반복됨을 회수합니다.",
+      "color": "#8B6C9B",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Synthesis",
+        "description": "레이어를 가로지르는 실천적 원리",
+        "repos": [
+          "incentives-everywhere",
+          "compounding-everywhere",
+          "feedback-loops-everywhere",
+          "leverage-everywhere"
+        ]
+      }]
+    }
+  ]
+}

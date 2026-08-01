@@ -1,0 +1,193 @@
+{
+  "id": "red",
+  "name": "Red",
+  "shortName": "RD",
+  "philosophy": "Episteme",
+  "subject": "AI & Mathematics",
+  "koreanSubject": "AI와 수학",
+  "organization": "iq-ai-lab",
+  "defaultBranch": "main",
+  "color": "#b84f63",
+  "softColor": "#f8e9ed",
+  "swatch": "#c64c60",
+  "heroEyebrow": "RED · EPISTEME · AI & MATHEMATICS",
+  "heroLead": "수학에서 지능까지,",
+  "heroAccent": "증명으로 연결.",
+  "description": "선형대수와 확률의 언어에서 출발해 신경망, 강화학습, 언어 모델과 최전선 연구까지 수학적 근거를 따라갑니다.",
+  "domains": [
+    {
+      "id": "core-mathematics",
+      "name": "Core Mathematics",
+      "englishName": "PATH 01 · L0 MATHEMATICS",
+      "description": "모든 AI 수식의 출발점이 되는 선형대수, 확률, 통계, 미적분과 정보이론",
+      "color": "#D6A0AA",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Core Mathematics",
+        "description": "AI를 설명하는 기본 언어",
+        "repos": [
+          "linear-algebra-deep-dive",
+          "probability-theory-deep-dive",
+          "mathematical-statistics-deep-dive",
+          "calculus-optimization-deep-dive",
+          "information-theory-deep-dive"
+        ]
+      }]
+    },
+    {
+      "id": "advanced-mathematics",
+      "name": "Advanced Mathematics",
+      "englishName": "PATH 02 · L0 MATHEMATICS",
+      "description": "Diffusion, 변분추론, RKHS와 최적화의 증명 엔진이 되는 고급 수학",
+      "color": "#C4A078",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Advanced Mathematics",
+        "description": "현대 AI 이론의 수학적 엔진",
+        "repos": [
+          "convex-optimization-deep-dive",
+          "stochastic-processes-deep-dive",
+          "sde-deep-dive",
+          "functional-analysis-deep-dive",
+          "information-geometry-deep-dive"
+        ]
+      }]
+    },
+    {
+      "id": "classical-ml-theory",
+      "name": "Classical ML Theory",
+      "englishName": "PATH 03 · L1 ML THEORY",
+      "description": "PAC·VC, 커널, 베이즈와 그래프 모델로 학습 가능성과 일반화를 설명합니다.",
+      "color": "#C3A36D",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Classical ML Theory",
+        "description": "고전 머신러닝의 수학적 토대",
+        "repos": [
+          "ml-fundamentals-deep-dive",
+          "statistical-learning-theory-deep-dive",
+          "kernel-methods-deep-dive",
+          "bayesian-ml-deep-dive",
+          "graphical-models-deep-dive"
+        ]
+      }]
+    },
+    {
+      "id": "neural-networks-architectures",
+      "name": "Neural Networks & Architectures",
+      "englishName": "PATH 04 · L2–L3",
+      "description": "역전파와 최적화부터 CNN, RNN, Transformer, GNN과 생성 모델까지 이어집니다.",
+      "color": "#7FAA90",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Neural Networks & Architectures",
+        "description": "현대 AI를 구성하는 학습 원리와 구조",
+        "repos": [
+          "neural-network-theory-deep-dive",
+          "optimization-theory-deep-dive",
+          "generalization-theory-deep-dive",
+          "regularization-theory-deep-dive",
+          "cnn-deep-dive",
+          "rnn-lstm-deep-dive",
+          "transformer-deep-dive",
+          "gnn-deep-dive",
+          "generative-model-deep-dive"
+        ]
+      }]
+    },
+    {
+      "id": "reinforcement-learning",
+      "name": "Reinforcement Learning",
+      "englishName": "PATH 05 · L4 DECISION",
+      "description": "MDP와 Bellman 방정식에서 정책 기울기, PPO와 강화학습 이론까지 다룹니다.",
+      "color": "#B66E64",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Reinforcement Learning",
+        "description": "의사결정과 행동 학습의 수학",
+        "repos": [
+          "rl-foundations-deep-dive",
+          "model-free-rl-deep-dive",
+          "deep-rl-deep-dive",
+          "policy-gradient-deep-dive",
+          "advanced-rl-deep-dive",
+          "rl-theory-deep-dive"
+        ]
+      }]
+    },
+    {
+      "id": "language-models",
+      "name": "Language Models",
+      "englishName": "PATH 06 · L4 LANGUAGE",
+      "description": "NLP의 기초에서 LLM 사전학습, 정렬, 효율화와 추론 시스템까지 연결합니다.",
+      "color": "#9583A8",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Language Models",
+        "description": "언어 모델의 학습과 추론",
+        "repos": [
+          "llm-pretraining-deep-dive",
+          "llm-alignment-deep-dive",
+          "llm-efficiency-deep-dive",
+          "llm-inference-deep-dive",
+          "nlp-foundations-deep-dive",
+          "pretrained-lm-deep-dive"
+        ]
+      }]
+    },
+    {
+      "id": "vision-audio",
+      "name": "Vision & Audio",
+      "englishName": "PATH 07 · L4 PERCEPTION",
+      "description": "이미지, 3D, 생성 비전과 음성의 표현·학습 구조를 살펴봅니다.",
+      "color": "#7896B4",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Vision & Audio",
+        "description": "멀티모달 AI의 각 감각 구조",
+        "repos": [
+          "vision-transformer-deep-dive",
+          "object-detection-deep-dive",
+          "diffusion-model-deep-dive",
+          "3d-neural-rendering-deep-dive",
+          "audio-speech-deep-dive"
+        ]
+      }]
+    },
+    {
+      "id": "systems-engineering",
+      "name": "Systems Engineering",
+      "englishName": "PATH 08 · L5 SYSTEMS",
+      "description": "PyTorch 내부 구조, 분산 학습, 효율화와 실험 통계로 이론을 실제 시스템으로 옮깁니다.",
+      "color": "#7F8F99",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Systems Engineering",
+        "description": "학습과 추론을 실행하는 시스템",
+        "repos": [
+          "pytorch-internals-deep-dive",
+          "distributed-training-deep-dive",
+          "efficient-ml-deep-dive",
+          "experimental-statistics-mlops-deep-dive"
+        ]
+      }]
+    },
+    {
+      "id": "frontier-research",
+      "name": "Frontier Research",
+      "englishName": "PATH 09 · L6 FRONTIER",
+      "description": "모델의 내부를 해석하고 추론과 검색을 확장하는 현재 진행형 연구를 다룹니다.",
+      "color": "#C27686",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Frontier Research",
+        "description": "해석, 추론, 검색의 연구 최전선",
+        "repos": [
+          "mechanistic-interpretability-deep-dive",
+          "llm-reasoning-deep-dive",
+          "retrieval-rag-deep-dive"
+        ]
+      }]
+    }
+  ]
+}

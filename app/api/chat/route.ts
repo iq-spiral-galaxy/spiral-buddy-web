@@ -1,3 +1,5 @@
+import { getTrack } from "@/app/catalog";
+
 type IncomingMessage = {
   role?: unknown;
   content?: unknown;
@@ -40,6 +42,7 @@ export async function POST(request: Request) {
   }
 
   let payload: {
+    trackId?: unknown;
     topic?: unknown;
     depth?: unknown;
     sourceTitle?: unknown;
@@ -67,6 +70,11 @@ export async function POST(request: Request) {
   }
 
   const topic = typeof payload.topic === "string" ? payload.topic.slice(0, 160) : "자유 주제";
+  const trackId = typeof payload.trackId === "string" ? payload.trackId.slice(0, 24) : "blue";
+  const track = getTrack(trackId);
+  if (!track) {
+    return Response.json({ error: "알 수 없는 학습 트랙이에요." }, { status: 400 });
+  }
   const depth = typeof payload.depth === "string" ? payload.depth.slice(0, 40) : "첫 이해";
   const sourceTitle = typeof payload.sourceTitle === "string" ? payload.sourceTitle.slice(0, 180) : "";
   const source = typeof payload.source === "string" ? payload.source.slice(0, 28_000) : "";
@@ -82,7 +90,7 @@ export async function POST(request: Request) {
     },
     body: JSON.stringify({
       model,
-      instructions: `${buddyInstructions}\n\nCurrent learning topic: ${topic}\nCurrent revisit depth: ${depth}${sourceContext}`,
+      instructions: `${buddyInstructions}\n\nCurrent knowledge track: ${track.name} · ${track.philosophy} · ${track.subject} (${track.koreanSubject})\nCurrent learning topic: ${topic}\nCurrent revisit depth: ${depth}${sourceContext}`,
       input: messages,
       max_output_tokens: 1400,
       store: false,

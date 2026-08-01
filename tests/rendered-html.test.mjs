@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { access, readFile } from "node:fs/promises";
 import test from "node:test";
+import { learningTitle, repoTitle } from "../app/title-utils.ts";
 
 const projectRoot = new URL("../", import.meta.url);
 
@@ -23,7 +24,13 @@ test("server-renders the Spiral Buddy learning experience", async () => {
 
   const html = await response.text();
   assert.match(html, /<title>Spiral Buddy/);
-  assert.match(html, /흩어진 공부를/);
+  assert.match(html, /코드에서 시스템까지/);
+  assert.match(html, /Blue · Software &amp; Systems/);
+  assert.match(html, /Red · AI &amp; Mathematics/);
+  assert.match(html, /Green · Practical Wisdom/);
+  assert.match(html, /Black · Physics &amp; Reality/);
+  assert.match(html, /White · Mind &amp; Consciousness/);
+  assert.match(html, /86.*232.*REPOSITORIES/);
   assert.match(html, /공통 기반/);
   assert.match(html, /Frontend/);
   assert.match(html, /Backend/);
@@ -32,7 +39,7 @@ test("server-renders the Spiral Buddy learning experience", async () => {
   assert.match(html, /Computer Architecture/);
   assert.match(html, />Git</);
   assert.doesNotMatch(html, /Git In Depth/);
-  assert.doesNotMatch(html, />[^<]*(?:Deep Dive|Compared)[^<]*</);
+  assert.doesNotMatch(html, />[^<]*(?:Deep Dive|Compared|Distilled)[^<]*</);
   assert.match(html, /레포, 기술, 카테고리 검색/);
   assert.match(html, /목차 보기/);
   assert.doesNotMatch(html, /GPT-5\.6 Luna|LIVE MODEL/);
@@ -49,21 +56,60 @@ test("repository curriculum endpoint only accepts curated safe paths", async () 
   );
   assert.equal(unsafePath.status, 400);
   assert.deepEqual(await unsafePath.json(), { error: "올바른 학습 문서 경로가 아니에요." });
+
+  const crossTrackRepo = await render(
+    "/api/repository?track=white&repo=linear-algebra-deep-dive",
+  );
+  assert.equal(crossTrackRepo.status, 404);
+
+  const redUnsafePath = await render(
+    "/api/repository?track=red&repo=optimization-theory-deep-dive&path=README.md",
+  );
+  assert.equal(redUnsafePath.status, 400);
 });
 
-test("catalog contains every curated learning repository exactly once", async () => {
-  const catalog = JSON.parse(await readFile(new URL("../data/catalog.json", import.meta.url), "utf8"));
-  const domains = catalog.domains;
+test("repository titles remove format suffixes without removing the subject", () => {
+  assert.equal(repoTitle("deep-rl-deep-dive"), "Deep RL");
+  assert.equal(repoTitle("3d-neural-rendering-deep-dive"), "3D & Neural Rendering");
+  assert.equal(repoTitle("probabilistic-thinking-distilled"), "Probabilistic Thinking");
+  assert.equal(repoTitle("concurrency-models-compared"), "Concurrency Models");
+  assert.equal(repoTitle("feedback-loops-everywhere"), "Feedback Loops Everywhere");
+  assert.equal(learningTitle("ch7-synthesis/01-predictions-compared.md"), "Predictions");
+});
+
+test("catalog contains every curated learning repository in the right track", async () => {
+  const blueCatalog = JSON.parse(await readFile(new URL("../data/catalog.json", import.meta.url), "utf8"));
+  const trackFiles = ["red", "green", "black", "white"];
+  const additionalTracks = await Promise.all(trackFiles.map(async (track) =>
+    JSON.parse(await readFile(new URL(`../data/tracks/${track}.json`, import.meta.url), "utf8")),
+  ));
+  const tracks = [
+    { id: "blue", organization: blueCatalog.organization, domains: blueCatalog.domains },
+    ...additionalTracks,
+  ];
+  const expected = {
+    blue: ["iq-dev-lab", 8, 86],
+    red: ["iq-ai-lab", 9, 48],
+    green: ["iq-phronesis-lab", 6, 31],
+    black: ["iq-physis-lab", 7, 36],
+    white: ["iq-psyche-lab", 7, 31],
+  };
+
+  for (const track of tracks) {
+    const categories = track.domains.flatMap((domain) => domain.categories);
+    const repos = categories.flatMap((category) => category.repos);
+    const [organization, domainCount, repoCount] = expected[track.id];
+    assert.equal(track.organization, organization);
+    assert.equal(track.domains.length, domainCount);
+    assert.equal(repos.length, repoCount);
+    assert.equal(new Set(repos).size, repoCount);
+    assert.ok(track.domains.every((domain) => domain.categories.length > 0));
+    assert.ok(categories.every((category) => category.repos.length > 0));
+  }
+
+  const domains = blueCatalog.domains;
   const categories = domains.flatMap((domain) => domain.categories);
   const repos = categories.flatMap((category) => category.repos);
-
-  assert.equal(catalog.organization, "iq-dev-lab");
-  assert.equal(domains.length, 8);
-  assert.equal(categories.length, 29);
-  assert.equal(repos.length, 86);
-  assert.equal(new Set(repos).size, 86);
-  assert.ok(domains.every((domain) => domain.categories.length > 0));
-  assert.ok(categories.every((category) => category.repos.length > 0));
 
   for (const expected of [
     "network-deep-dive",
@@ -79,6 +125,22 @@ test("catalog contains every curated learning repository exactly once", async ()
   for (const excluded of [".github", "iq-dev-lab.github.io", "object"]) {
     assert.ok(!repos.includes(excluded), `${excluded} should stay out of the learning catalog`);
   }
+
+  const allRepoEntries = tracks.flatMap((track) =>
+    track.domains.flatMap((domain) =>
+      domain.categories.flatMap((category) => category.repos.map((repo) => `${track.id}:${repo}`)),
+    ),
+  );
+  assert.equal(allRepoEntries.length, 232);
+  assert.equal(new Set(allRepoEntries).size, 232);
+
+  const redRepos = additionalTracks[0].domains.flatMap((domain) =>
+    domain.categories.flatMap((category) => category.repos),
+  );
+  assert.ok(redRepos.includes("optimization-theory-deep-dive"));
+  assert.ok(redRepos.includes("regularization-theory-deep-dive"));
+  assert.ok(!redRepos.includes("optimization-theory-deep-dive.md"));
+  assert.ok(!redRepos.includes("regularization-theory-deep-dive.md"));
 });
 
 test("removes the disposable starter preview", async () => {

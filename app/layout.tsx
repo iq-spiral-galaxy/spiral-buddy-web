@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import "./globals.css";
 
 const title = "Spiral Buddy — 질문으로 깊어지는 학습";
-const description = "질문하고, 연결하고, 다시 설명하며 이해를 쌓는 AI 학습 버디.";
+const description = "개발·AI·실천지·물리·마음의 다섯 트랙을 질문하고 연결하며 이해를 쌓는 AI 학습 버디.";
 
 export async function generateMetadata(): Promise<Metadata> {
   const requestHeaders = await headers();

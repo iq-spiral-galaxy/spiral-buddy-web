@@ -5,12 +5,14 @@ import {
   findRepo,
   getDomainRepoCount,
   getRepoUrl,
-  learningDomains,
+  getTrack,
+  getTrackRepoCount,
+  learningTracks,
   repoTitle,
-  totalCategoryCount,
   totalRepoCount,
   type LearningCategory,
   type LearningDomain,
+  type LearningTrack,
 } from "@/app/catalog";
 
 type Role = "user" | "assistant";
@@ -23,6 +25,8 @@ type Message = {
 
 type Topic = {
   id: string;
+  trackId: string;
+  trackName: string;
   eyebrow: string;
   title: string;
   description: string;
@@ -58,6 +62,8 @@ type CurriculumChapter = {
 };
 
 type RepositoryCurriculum = {
+  track: string;
+  organization: string;
   repo: string;
   branch: string;
   chapters: CurriculumChapter[];
@@ -78,11 +84,12 @@ type LessonSelection = {
 
 type LessonSource =
   | { status: "idle" | "loading" }
-  | { status: "ready"; content: string }
+  | { status: "ready"; path: string; content: string }
   | { status: "error"; message: string };
 
 const depthLabels = ["첫 이해", "다시 보기", "더 깊이"];
-const sessionStorageKey = "spiral-buddy-session-v3";
+const sessionStorageKey = "spiral-buddy-session-v4";
+const legacySessionStorageKey = "spiral-buddy-session-v3";
 
 function createId(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -91,7 +98,10 @@ function createId(prefix: string) {
 function isStoredTopic(value: unknown): value is Topic {
   if (!value || typeof value !== "object") return false;
   const topic = value as Partial<Topic>;
-  return typeof topic.id === "string" && typeof topic.title === "string" && typeof topic.eyebrow === "string";
+  return typeof topic.id === "string"
+    && typeof topic.trackId === "string"
+    && typeof topic.title === "string"
+    && typeof topic.eyebrow === "string";
 }
 
 function isStoredLesson(value: unknown): value is LessonSelection {
@@ -108,17 +118,19 @@ function lessonWelcomeMessage(repoName: string, lesson: LessonSelection): Messag
   };
 }
 
-function topicFromRepo(domain: LearningDomain, category: LearningCategory, slug: string): Topic {
+function topicFromRepo(track: LearningTrack, domain: LearningDomain, category: LearningCategory, slug: string): Topic {
   return {
-    id: slug,
-    eyebrow: `${domain.name} · ${category.name}`,
+    id: `${track.id}:${slug}`,
+    trackId: track.id,
+    trackName: track.name,
+    eyebrow: `${track.name} · ${domain.name}${category.id === "curriculum" ? "" : ` · ${category.name}`}`,
     title: repoTitle(slug),
     description: category.description,
     tone: domain.color,
     domain: domain.name,
     category: category.name,
     repoSlug: slug,
-    repoUrl: getRepoUrl(slug),
+    repoUrl: getRepoUrl(slug, track.id),
   };
 }
 
@@ -131,6 +143,7 @@ export default function Home() {
   const [notice, setNotice] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [selectedTrackId, setSelectedTrackId] = useState("blue");
   const [selectedDomain, setSelectedDomain] = useState("common");
   const [query, setQuery] = useState("");
   const [curriculum, setCurriculum] = useState<RepositoryCurriculum | null>(null);
@@ -141,32 +154,68 @@ export default function Home() {
   const [activeLesson, setActiveLesson] = useState<LessonSelection | null>(null);
   const [lessonSource, setLessonSource] = useState<LessonSource>({ status: "idle" });
   const conversationEndRef = useRef<HTMLDivElement>(null);
+  const streamControllerRef = useRef<AbortController | null>(null);
+  const streamRequestIdRef = useRef(0);
 
   useEffect(() => {
     const restoreSession = window.setTimeout(() => {
       try {
-        const saved = window.localStorage.getItem(sessionStorageKey);
+        const saved = window.localStorage.getItem(sessionStorageKey)
+          ?? window.localStorage.getItem(legacySessionStorageKey);
         if (saved) {
           const parsed = JSON.parse(saved) as {
             topic?: unknown;
             topicId?: string;
+            trackId?: string;
+            repoSlug?: string;
             lesson?: unknown;
             messages?: Message[];
             depth?: number;
           };
-          let restoredTopic = isStoredTopic(parsed.topic) ? parsed.topic : null;
+          let restoredTopic: Topic | null = null;
 
-          if (!restoredTopic && parsed.topicId) {
-            const repo = findRepo(parsed.topicId);
-            if (repo) restoredTopic = topicFromRepo(repo.domain, repo.category, repo.slug);
+          if (isStoredTopic(parsed.topic)) {
+            const storedTrack = getTrack(parsed.topic.trackId);
+            if (storedTrack && parsed.topic.repoSlug) {
+              const storedRepo = findRepo(parsed.topic.repoSlug, storedTrack.id);
+              if (storedRepo) {
+                restoredTopic = topicFromRepo(
+                  storedRepo.track,
+                  storedRepo.domain,
+                  storedRepo.category,
+                  storedRepo.slug,
+                );
+              }
+            } else if (storedTrack && !parsed.topic.repoSlug) {
+              restoredTopic = {
+                ...parsed.topic,
+                id: `${storedTrack.id}:custom`,
+                trackId: storedTrack.id,
+                trackName: storedTrack.name,
+                eyebrow: `${storedTrack.name} · Your own question`,
+                tone: storedTrack.color,
+              };
+            }
+          }
+
+          if (!restoredTopic && (parsed.repoSlug || parsed.topicId)) {
+            const inferredTrackId = parsed.trackId || "blue";
+            const inferredSlug = parsed.repoSlug
+              ?? (parsed.topicId?.includes(":") ? parsed.topicId.split(":").slice(1).join(":") : parsed.topicId)
+              ?? "";
+            const repo = findRepo(inferredSlug, inferredTrackId);
+            if (repo) restoredTopic = topicFromRepo(repo.track, repo.domain, repo.category, repo.slug);
           }
 
           if (restoredTopic && Array.isArray(parsed.messages)) {
             setActiveTopic(restoredTopic);
+            setSelectedTrackId(restoredTopic.trackId);
+            setSelectedDomain(restoredTopic.trackId === "blue" ? "common" : "all");
             if (isStoredLesson(parsed.lesson)) setActiveLesson(parsed.lesson);
             setMessages(parsed.messages.slice(-30));
             setDepth(Math.min(Math.max(parsed.depth ?? 0, 0), 2));
           }
+          window.localStorage.removeItem(legacySessionStorageKey);
         }
       } catch {
         window.localStorage.removeItem(sessionStorageKey);
@@ -182,12 +231,21 @@ export default function Home() {
     if (!hydrated) return;
     if (!activeTopic) {
       window.localStorage.removeItem(sessionStorageKey);
+      window.localStorage.removeItem(legacySessionStorageKey);
       return;
     }
     const persistSession = window.setTimeout(() => {
       window.localStorage.setItem(
         sessionStorageKey,
-        JSON.stringify({ topic: activeTopic, topicId: activeTopic.id, lesson: activeLesson, messages, depth }),
+        JSON.stringify({
+          topic: activeTopic,
+          topicId: activeTopic.id,
+          trackId: activeTopic.trackId,
+          repoSlug: activeTopic.repoSlug,
+          lesson: activeLesson,
+          messages,
+          depth,
+        }),
       );
     }, 350);
     return () => window.clearTimeout(persistSession);
@@ -196,6 +254,10 @@ export default function Home() {
   useEffect(() => {
     conversationEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, isStreaming]);
+
+  useEffect(() => () => {
+    streamControllerRef.current?.abort();
+  }, []);
 
   useEffect(() => {
     if (!sidebarOpen) return;
@@ -208,7 +270,8 @@ export default function Home() {
 
   useEffect(() => {
     const repoSlug = activeTopic?.repoSlug;
-    if (!repoSlug) return;
+    const trackId = activeTopic?.trackId;
+    if (!repoSlug || !trackId) return;
 
     const controller = new AbortController();
     const markLoading = window.setTimeout(() => {
@@ -217,7 +280,10 @@ export default function Home() {
       setCurriculumError("");
     }, 0);
 
-    void fetch(`/api/repository?repo=${encodeURIComponent(repoSlug)}`, { signal: controller.signal })
+    void fetch(
+      `/api/repository?track=${encodeURIComponent(trackId)}&repo=${encodeURIComponent(repoSlug)}`,
+      { signal: controller.signal },
+    )
       .then(async (response) => {
         const payload = (await response.json().catch(() => null)) as (RepositoryCurriculum & { error?: string }) | null;
         if (!response.ok || !payload) throw new Error(payload?.error || "학습 목차를 불러오지 못했어요.");
@@ -234,7 +300,7 @@ export default function Home() {
       window.clearTimeout(markLoading);
       controller.abort();
     };
-  }, [activeTopic?.repoSlug, curriculumReload]);
+  }, [activeTopic?.repoSlug, activeTopic?.trackId, curriculumReload]);
 
   useEffect(() => {
     if (!activeTopic?.repoSlug || !curriculum?.chapters.length) return;
@@ -268,13 +334,14 @@ export default function Home() {
 
   useEffect(() => {
     const repoSlug = activeTopic?.repoSlug;
+    const trackId = activeTopic?.trackId;
     const lessonPath = activeLesson?.path;
-    if (!repoSlug || !lessonPath) return;
+    if (!repoSlug || !trackId || !lessonPath) return;
 
     const controller = new AbortController();
     const markLoading = window.setTimeout(() => setLessonSource({ status: "loading" }), 0);
     void fetch(
-      `/api/repository?repo=${encodeURIComponent(repoSlug)}&path=${encodeURIComponent(lessonPath)}`,
+      `/api/repository?track=${encodeURIComponent(trackId)}&repo=${encodeURIComponent(repoSlug)}&path=${encodeURIComponent(lessonPath)}`,
       { signal: controller.signal },
     )
       .then(async (response) => {
@@ -282,7 +349,7 @@ export default function Home() {
         if (!response.ok || typeof payload?.content !== "string") {
           throw new Error(payload?.error || "학습 원문을 불러오지 못했어요.");
         }
-        setLessonSource({ status: "ready", content: payload.content });
+        setLessonSource({ status: "ready", path: lessonPath, content: payload.content });
       })
       .catch((error) => {
         if (error instanceof DOMException && error.name === "AbortError") return;
@@ -296,16 +363,19 @@ export default function Home() {
       window.clearTimeout(markLoading);
       controller.abort();
     };
-  }, [activeLesson?.path, activeTopic?.repoSlug]);
+  }, [activeLesson?.path, activeTopic?.repoSlug, activeTopic?.trackId]);
 
+  const selectedTrack = getTrack(selectedTrackId) ?? learningTracks[0]!;
+  const trackDomains = selectedTrack.domains;
+  const selectedTrackRepoCount = getTrackRepoCount(selectedTrack);
   const normalizedQuery = query.trim().toLocaleLowerCase("ko");
 
   const visibleDomains = useMemo<VisibleDomain[]>(() => {
     const sourceDomains = normalizedQuery
-      ? learningDomains
+      ? trackDomains
       : selectedDomain === "all"
-        ? learningDomains
-        : learningDomains.filter((domain) => domain.id === selectedDomain);
+        ? trackDomains
+        : trackDomains.filter((domain) => domain.id === selectedDomain);
 
     return sourceDomains
       .map((domain) => ({
@@ -323,6 +393,9 @@ export default function Home() {
                 domain.description,
                 category.name,
                 category.description,
+                selectedTrack.name,
+                selectedTrack.subject,
+                selectedTrack.koreanSubject,
               ]
                 .join(" ")
                 .toLocaleLowerCase("ko");
@@ -332,7 +405,7 @@ export default function Home() {
           .filter((category) => category.repos.length > 0),
       }))
       .filter((domain) => domain.categories.length > 0);
-  }, [normalizedQuery, selectedDomain]);
+  }, [normalizedQuery, selectedDomain, selectedTrack, trackDomains]);
 
   const visibleRepoCount = useMemo(
     () => visibleDomains.reduce(
@@ -347,7 +420,7 @@ export default function Home() {
 
   const selectedDomainName = selectedDomain === "all"
     ? "전체 분야"
-    : learningDomains.find((domain) => domain.id === selectedDomain)?.name ?? "학습 라이브러리";
+    : trackDomains.find((domain) => domain.id === selectedDomain)?.name ?? "학습 라이브러리";
 
   const conversationProgress = useMemo(() => {
     const userTurns = messages.filter((message) => message.role === "user").length;
@@ -362,7 +435,16 @@ export default function Home() {
     ? `${depthLabels[depth]} · ${activeLesson.itemOrder + 1}/${activeCurriculumChapter.items.length}`
     : `${depthLabels[depth]} · 흐름 ${progress}%`;
 
+  function cancelActiveStream() {
+    streamRequestIdRef.current += 1;
+    streamControllerRef.current?.abort();
+    streamControllerRef.current = null;
+    setIsStreaming(false);
+  }
+
   function startTopic(topic: Topic) {
+    cancelActiveStream();
+    setSelectedTrackId(topic.trackId);
     setActiveTopic(topic);
     setCurriculum(null);
     setCurriculumStatus(topic.repoSlug ? "loading" : "idle");
@@ -380,6 +462,7 @@ export default function Home() {
   }
 
   function selectLesson(chapter: CurriculumChapter, item: CurriculumItem) {
+    cancelActiveStream();
     const lesson: LessonSelection = {
       chapterId: chapter.id,
       chapterTitle: chapter.title,
@@ -390,6 +473,7 @@ export default function Home() {
       path: item.path,
     };
     setActiveLesson(lesson);
+    setLessonSource({ status: "idle" });
     setExpandedChapters((current) => current.includes(chapter.id) ? current : [...current, chapter.id]);
     setMessages([lessonWelcomeMessage(activeTopic?.title ?? "이 레포", lesson)]);
     setDraft("");
@@ -406,6 +490,7 @@ export default function Home() {
   }
 
   function returnToCatalog() {
+    cancelActiveStream();
     setActiveTopic(null);
     setMessages([]);
     setCurriculum(null);
@@ -426,6 +511,14 @@ export default function Home() {
     setQuery("");
   }
 
+  function showTrack(trackId: string) {
+    if (!getTrack(trackId)) return;
+    returnToCatalog();
+    setSelectedTrackId(trackId);
+    setSelectedDomain("all");
+    setQuery("");
+  }
+
   async function sendMessage(override?: string) {
     const content = (override ?? draft).trim();
     if (!content || isStreaming || !activeTopic || (activeTopic.repoSlug && !activeLesson)) return;
@@ -433,6 +526,10 @@ export default function Home() {
     const userMessage: Message = { id: createId("user"), role: "user", content };
     const assistantId = createId("buddy");
     const nextMessages = [...messages, userMessage];
+    const controller = new AbortController();
+    const requestId = streamRequestIdRef.current + 1;
+    streamRequestIdRef.current = requestId;
+    streamControllerRef.current = controller;
 
     setDraft("");
     setNotice(null);
@@ -442,13 +539,17 @@ export default function Home() {
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
+        signal: controller.signal,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          trackId: activeTopic.trackId,
           topic: activeLesson
             ? `${activeLesson.itemTitle} · ${activeLesson.chapterTitle} · ${activeTopic.title}`
             : activeTopic.title,
           sourceTitle: activeLesson?.itemTitle,
-          source: lessonSource.status === "ready" ? lessonSource.content : undefined,
+          source: lessonSource.status === "ready" && lessonSource.path === activeLesson?.path
+            ? lessonSource.content
+            : undefined,
           depth: depthLabels[depth],
           messages: nextMessages.map(({ role, content: messageContent }) => ({
             role,
@@ -471,6 +572,7 @@ export default function Home() {
 
       while (true) {
         const { done, value } = await reader.read();
+        if (requestId !== streamRequestIdRef.current) return;
         if (done) break;
         buffer += decoder.decode(value, { stream: true });
         const blocks = buffer.split("\n\n");
@@ -512,11 +614,17 @@ export default function Home() {
 
       if (!receivedText) throw new Error("Buddy가 빈 응답을 보냈어요. 다시 시도해 주세요.");
     } catch (error) {
+      if (requestId !== streamRequestIdRef.current || (error instanceof DOMException && error.name === "AbortError")) {
+        return;
+      }
       const message = error instanceof Error ? error.message : "잠시 후 다시 시도해 주세요.";
       setMessages((current) => current.filter((item) => item.id !== assistantId));
       setNotice(message);
     } finally {
-      setIsStreaming(false);
+      if (requestId === streamRequestIdRef.current) {
+        streamControllerRef.current = null;
+        setIsStreaming(false);
+      }
     }
   }
 
@@ -533,7 +641,13 @@ export default function Home() {
   }
 
   return (
-    <main className="app-shell">
+    <main
+      className="app-shell"
+      style={{
+        "--track-color": selectedTrack.color,
+        "--track-soft": selectedTrack.softColor,
+      } as React.CSSProperties}
+    >
       <button
         className="mobile-menu"
         type="button"
@@ -565,8 +679,34 @@ export default function Home() {
           </span>
         </button>
 
+        <nav className="track-nav" aria-label="Buddy 학습 트랙">
+          <p className="nav-label">BUDDY TRACKS</p>
+          <div className="track-switcher">
+            {learningTracks.map((track) => (
+              <button
+                type="button"
+                key={track.id}
+                className={selectedTrack.id === track.id ? "track-active" : ""}
+                onClick={() => showTrack(track.id)}
+                aria-label={`${track.name} · ${track.subject}`}
+                aria-pressed={selectedTrack.id === track.id}
+                title={`${track.name} · ${track.subject}`}
+                style={{ "--track-swatch": track.swatch } as React.CSSProperties}
+              >
+                <i aria-hidden="true" />
+                <span>{track.name}</span>
+              </button>
+            ))}
+          </div>
+          <div className="active-track-card">
+            <p>{selectedTrack.name} · {selectedTrack.philosophy}</p>
+            <strong>{selectedTrack.subject}</strong>
+            <span>{selectedTrack.koreanSubject}</span>
+          </div>
+        </nav>
+
         <nav className="domain-nav" aria-label="학습 분야">
-          <p className="nav-label">LEARNING DOMAINS</p>
+          <p className="nav-label">{selectedTrack.name.toUpperCase()} LEARNING PATH</p>
           <button
             className={`domain-nav-item ${selectedDomain === "all" ? "domain-nav-active" : ""}`}
             type="button"
@@ -581,10 +721,10 @@ export default function Home() {
                 <rect x="9.5" y="9.5" width="5" height="5" rx="1.2" />
               </svg>
             </span>
-            <span><strong>전체 분야</strong><small>Complete library</small></span>
-            <em>{totalRepoCount}</em>
+            <span><strong>전체 분야</strong><small>Complete track</small></span>
+            <em>{selectedTrackRepoCount}</em>
           </button>
-          {learningDomains.map((domain) => (
+          {trackDomains.map((domain) => (
             <button
               className={`domain-nav-item ${selectedDomain === domain.id ? "domain-nav-active" : ""}`}
               type="button"
@@ -613,6 +753,8 @@ export default function Home() {
           <div className="breadcrumb">
             <button type="button" onClick={returnToCatalog}>학습 라이브러리</button>
             <span>/</span>
+            <b>{selectedTrack.name}</b>
+            <span>/</span>
             <strong>{activeTopic?.title ?? selectedDomainName}</strong>
           </div>
           <div className="topbar-actions">
@@ -637,7 +779,7 @@ export default function Home() {
                 </div>
               </>
             ) : (
-              <span className="catalog-count">{totalRepoCount} REPOSITORIES</span>
+              <span className="catalog-count">{selectedTrackRepoCount} / {totalRepoCount} REPOSITORIES</span>
             )}
           </div>
         </header>
@@ -649,18 +791,15 @@ export default function Home() {
 
             <div className="catalog-intro">
               <div className="welcome-copy">
-                <p className="eyebrow">ONE LIBRARY · EVERY SOFTWARE PATH</p>
-                <h1>흩어진 공부를,<br />하나의 <span>지도</span>로.</h1>
-                <p className="welcome-description">
-                  공통 기반은 함께 묶고, Frontend·Backend·Android·iOS는 분명하게 나눴어요.
-                  레포를 고르면 그 자리에서 Buddy와 학습을 시작할 수 있습니다.
-                </p>
+                <p className="eyebrow">{selectedTrack.heroEyebrow}</p>
+                <h1>{selectedTrack.heroLead}<br /><span>{selectedTrack.heroAccent}</span></h1>
+                <p className="welcome-description">{selectedTrack.description}</p>
               </div>
 
               <dl className="catalog-stats" aria-label="학습 라이브러리 규모">
-                <div><dt>{totalRepoCount}</dt><dd>학습 레포</dd></div>
-                <div><dt>{learningDomains.length}</dt><dd>상위 분야</dd></div>
-                <div><dt>{totalCategoryCount}</dt><dd>세부 카테고리</dd></div>
+                <div><dt>{selectedTrackRepoCount}</dt><dd>학습 레포</dd></div>
+                <div><dt>{trackDomains.length}</dt><dd>{selectedTrack.id === "blue" ? "상위 분야" : "학습 경로"}</dd></div>
+                <div><dt>{learningTracks.length}</dt><dd>Buddy 트랙</dd></div>
               </dl>
             </div>
 
@@ -670,7 +809,7 @@ export default function Home() {
                   <p>학습 라이브러리</p>
                   <h2 id="catalog-title">직접 살펴보고 시작하세요</h2>
                 </div>
-                <span>CURATED FROM IQ-DEV-LAB</span>
+                <span>CURATED FROM {selectedTrack.organization.toUpperCase()}</span>
               </div>
 
               <div className="catalog-controls">
@@ -695,9 +834,9 @@ export default function Home() {
                     onClick={() => showDomain("all")}
                     aria-pressed={selectedDomain === "all"}
                   >
-                    전체 <span>{totalRepoCount}</span>
+                    전체 <span>{selectedTrackRepoCount}</span>
                   </button>
-                  {learningDomains.map((domain) => (
+                  {trackDomains.map((domain) => (
                     <button
                       type="button"
                       key={domain.id}
@@ -713,7 +852,7 @@ export default function Home() {
 
               <p className="catalog-result-status" role="status" aria-live="polite">
                 {normalizedQuery
-                  ? `전체 분야에서 “${query.trim()}” 검색 · ${visibleRepoCount}개 레포`
+                  ? `${selectedTrack.name} 전체에서 “${query.trim()}” 검색 · ${visibleRepoCount}개 레포`
                   : `${selectedDomainName} · ${visibleRepoCount}개 레포`}
               </p>
 
@@ -736,14 +875,20 @@ export default function Home() {
 
                     <div className="category-list">
                       {categories.map(({ category, repos }) => (
-                        <section className="category-section" key={category.id} aria-labelledby={`${domain.id}-${category.id}`}>
-                          <header className="category-header">
-                            <div>
-                              <h4 id={`${domain.id}-${category.id}`}>{category.name}</h4>
-                              <p>{category.description}</p>
-                            </div>
-                            <span>{repos.length}</span>
-                          </header>
+                        <section
+                          className={`category-section ${category.id === "curriculum" ? "category-flat" : ""}`}
+                          key={category.id}
+                          aria-labelledby={category.id === "curriculum" ? undefined : `${domain.id}-${category.id}`}
+                        >
+                          {category.id !== "curriculum" && (
+                            <header className="category-header">
+                              <div>
+                                <h4 id={`${domain.id}-${category.id}`}>{category.name}</h4>
+                                <p>{category.description}</p>
+                              </div>
+                              <span>{repos.length}</span>
+                            </header>
+                          )}
 
                           <div className="repo-grid">
                             {repos.map((slug) => (
@@ -751,7 +896,7 @@ export default function Home() {
                                 <div className="repo-card-meta">
                                   <span>{category.name}</span>
                                   <a
-                                    href={getRepoUrl(slug)}
+                                    href={getRepoUrl(slug, selectedTrack.id)}
                                     target="_blank"
                                     rel="noreferrer"
                                     aria-label={`${repoTitle(slug)} GitHub 레포 열기`}
@@ -760,7 +905,7 @@ export default function Home() {
                                   </a>
                                 </div>
                                 <h5>{repoTitle(slug)}</h5>
-                                <button type="button" onClick={() => startTopic(topicFromRepo(domain, category, slug))}>
+                                <button type="button" onClick={() => startTopic(topicFromRepo(selectedTrack, domain, category, slug))}>
                                   목차 보기 <span>→</span>
                                 </button>
                               </article>
@@ -783,11 +928,13 @@ export default function Home() {
               </div>
 
               <button className="custom-start" type="button" onClick={() => startTopic({
-                id: "custom",
-                eyebrow: "Your own question",
+                id: `${selectedTrack.id}:custom`,
+                trackId: selectedTrack.id,
+                trackName: selectedTrack.name,
+                eyebrow: `${selectedTrack.name} · Your own question`,
                 title: "내가 고른 주제",
                 description: "",
-                tone: "#315ee7",
+                tone: selectedTrack.color,
               })}>
                 <span>＋</span>
                 <div><strong>레포 밖의 주제로 시작하기</strong><small>지금 궁금한 것을 자유롭게 물어보세요</small></div>
@@ -811,7 +958,15 @@ export default function Home() {
                   </div>
                 )}
               </div>
-              <div className="session-progress" aria-label={`학습 흐름 ${progress}%`}>
+              <div
+                className="session-progress"
+                role="progressbar"
+                aria-label="학습 흐름"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={progress}
+                aria-valuetext={progressText}
+              >
                 <div><span style={{ width: `${progress}%` }} /></div>
                 <small>{progressText}</small>
               </div>
@@ -836,6 +991,7 @@ export default function Home() {
 
                   {curriculumStatus === "loading" && (
                     <div className="curriculum-loading" role="status">
+                      <p className="sr-only">레포의 챕터와 학습 항목을 불러오는 중입니다.</p>
                       <span /><span /><span /><span />
                     </div>
                   )}
@@ -931,7 +1087,7 @@ export default function Home() {
                   </div>
                 ) : (
                   <>
-                    <div className="conversation" aria-live="polite">
+                    <div className="conversation" role="log" aria-live="polite" aria-relevant="additions text">
                       {messages.map((message) => (
                         <article className={`message message-${message.role}`} key={message.id}>
                           <div className="message-avatar" aria-hidden="true">

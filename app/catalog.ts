@@ -1,4 +1,12 @@
-import catalogData from "@/data/catalog.json";
+import blueCatalogData from "@/data/catalog.json";
+import blueTrackData from "@/data/tracks/blue.json";
+import redTrackData from "@/data/tracks/red.json";
+import greenTrackData from "@/data/tracks/green.json";
+import blackTrackData from "@/data/tracks/black.json";
+import whiteTrackData from "@/data/tracks/white.json";
+import { repoTitle } from "@/app/title-utils";
+
+export { learningTitle, repoTitle } from "@/app/title-utils";
 
 export type LearningCategory = {
   id: string;
@@ -16,119 +24,89 @@ export type LearningDomain = {
   categories: LearningCategory[];
 };
 
+export type LearningTrack = {
+  id: string;
+  name: string;
+  shortName: string;
+  philosophy: string;
+  subject: string;
+  koreanSubject: string;
+  organization: string;
+  defaultBranch: string;
+  color: string;
+  softColor: string;
+  swatch: string;
+  heroEyebrow: string;
+  heroLead: string;
+  heroAccent: string;
+  description: string;
+  domains: LearningDomain[];
+};
+
 export type RepoLocation = {
   slug: string;
   title: string;
+  track: LearningTrack;
   domain: LearningDomain;
   category: LearningCategory;
 };
 
-export const catalogOrganization = catalogData.organization;
-export const learningDomains = catalogData.domains as LearningDomain[];
+type TrackMetadata = Omit<LearningTrack, "domains">;
 
-const titleTokens: Record<string, string> = {
-  android: "Android",
-  api: "API",
-  apis: "APIs",
-  async: "Async",
-  aqe: "AQE",
-  cbo: "CBO",
-  caching: "Caching",
-  cicd: "CI/CD",
-  cqrs: "CQRS",
-  css: "CSS",
-  cssom: "CSSOM",
-  dom: "DOM",
-  db: "DB",
-  ddd: "DDD",
-  elasticsearch: "Elasticsearch",
-  flutter: "Flutter",
-  git: "Git",
-  go: "Go",
-  gpu: "GPU",
-  grpc: "gRPC",
-  iac: "IaC",
-  ios: "iOS",
-  ipc: "IPC",
-  java: "Java",
-  javascript: "JavaScript",
-  jetpack: "Jetpack",
-  jvm: "JVM",
-  kafka: "Kafka",
-  kotlin: "Kotlin",
-  kubernetes: "Kubernetes",
-  linux: "Linux",
-  lcp: "LCP",
-  cls: "CLS",
-  inp: "INP",
-  msa: "MSA",
-  mysql: "MySQL",
-  objc: "Objective-C",
-  os: "OS",
-  orm: "ORM",
-  postgresql: "PostgreSQL",
-  rabbitmq: "RabbitMQ",
-  react: "React",
-  rdd: "RDD",
-  redis: "Redis",
-  spark: "Spark",
-  spring: "Spring",
-  swift: "Swift",
-  swiftui: "SwiftUI",
-  typescript: "TypeScript",
-  uikit: "UIKit",
-  ui: "UI",
-  v8: "V8",
-  wasm: "WebAssembly",
-  webflux: "WebFlux",
+const blueTrack: LearningTrack = {
+  ...(blueTrackData as TrackMetadata),
+  organization: blueCatalogData.organization,
+  domains: blueCatalogData.domains as LearningDomain[],
 };
 
-const repositorySuffixTokens = new Set(["deep", "dive", "compared"]);
-const repositoryTitleOverrides: Record<string, string> = {
-  "git-in-depth": "Git",
-};
+export const learningTracks: LearningTrack[] = [
+  blueTrack,
+  redTrackData as LearningTrack,
+  greenTrackData as LearningTrack,
+  blackTrackData as LearningTrack,
+  whiteTrackData as LearningTrack,
+];
 
-export function repoTitle(slug: string) {
-  if (repositoryTitleOverrides[slug]) return repositoryTitleOverrides[slug];
-  return learningTitle(slug);
-}
+export const catalogOrganization = blueTrack.organization;
+export const learningDomains = blueTrack.domains;
 
-export function learningTitle(identifier: string) {
-  const basename = identifier.split("/").pop() ?? identifier;
-  return basename
-    .replace(/\.md$/i, "")
-    .replace(/^(?:(?:chapter|챕터|ch)[-_ ]*)?\d+[-_. )]*/i, "")
-    .split("-")
-    .filter((token) => !repositorySuffixTokens.has(token))
-    .map((token) => titleTokens[token] ?? `${token.charAt(0).toUpperCase()}${token.slice(1)}`)
-    .join(" ");
-}
-
-export const repoLocations: RepoLocation[] = learningDomains.flatMap((domain) =>
-  domain.categories.flatMap((category) =>
-    category.repos.map((slug) => ({
-      slug,
-      title: repoTitle(slug),
-      domain,
-      category,
-    })),
+export const repoLocations: RepoLocation[] = learningTracks.flatMap((track) =>
+  track.domains.flatMap((domain) =>
+    domain.categories.flatMap((category) =>
+      category.repos.map((slug) => ({
+        slug,
+        title: repoTitle(slug),
+        track,
+        domain,
+        category,
+      })),
+    ),
   ),
 );
 
 export const totalRepoCount = repoLocations.length;
-export const totalCategoryCount = learningDomains.reduce(
-  (total, domain) => total + domain.categories.length,
-  0,
-);
 
-export function getRepoUrl(slug: string) {
-  return `https://github.com/${catalogOrganization}/${slug}`;
+export function getTrack(trackId: string) {
+  return learningTracks.find((track) => track.id === trackId);
+}
+
+export function getTrackRepoCount(track: LearningTrack) {
+  return track.domains.reduce((total, domain) => total + getDomainRepoCount(domain), 0);
+}
+
+export function getTrackCategoryCount(track: LearningTrack) {
+  return track.domains.reduce((total, domain) => total + domain.categories.length, 0);
+}
+
+export function getRepoUrl(slug: string, trackId = "blue") {
+  const track = getTrack(trackId) ?? blueTrack;
+  return `https://github.com/${track.organization}/${slug}`;
 }
 
 export function getDomainRepoCount(domain: LearningDomain) {
   return domain.categories.reduce((total, category) => total + category.repos.length, 0);
 }
 
-export function findRepo(slug: string) {
-  return repoLocations.find((repo) => repo.slug === slug);
+export function findRepo(slug: string, trackId = "blue") {
+  return repoLocations.find((repo) => repo.track.id === trackId && repo.slug === slug);
 }

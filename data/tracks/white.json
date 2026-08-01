@@ -1,0 +1,148 @@
+{
+  "id": "white",
+  "name": "White",
+  "shortName": "WH",
+  "philosophy": "Psyche",
+  "subject": "Mind & Consciousness",
+  "koreanSubject": "마음과 의식",
+  "organization": "iq-psyche-lab",
+  "defaultBranch": "main",
+  "color": "#81778e",
+  "softColor": "#f0edf4",
+  "swatch": "#f7f4ed",
+  "heroEyebrow": "WHITE · PSYCHE · MIND & CONSCIOUSNESS",
+  "heroLead": "뉴런에서 자아까지,",
+  "heroAccent": "질문으로 연결.",
+  "description": "뇌의 물리적 기질에서 인지와 계산, 의식의 어려운 문제와 자아까지 이어지는 설명의 층을 정직하게 구분하며 탐구합니다.",
+  "domains": [
+    {
+      "id": "language-of-mind",
+      "name": "Language of Mind",
+      "englishName": "L0 · FOUNDATIONS & METHODS",
+      "description": "마음-몸 지형, 설명 층위, 계산과 표상, 정보와 1인칭 방법으로 탐구의 언어를 세웁니다.",
+      "color": "#C76519",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Language of Mind",
+        "description": "마음을 탐구하는 자의 모국어",
+        "repos": [
+          "mind-body-map-distilled",
+          "levels-of-explanation-distilled",
+          "computation-representation-distilled",
+          "information-prediction-distilled",
+          "first-person-methods-distilled"
+        ]
+      }]
+    },
+    {
+      "id": "neural-substrate",
+      "name": "Neural Substrate",
+      "englishName": "L1 · BRAIN & NEURAL SYSTEMS",
+      "description": "뉴런과 신경 부호, 뇌 구조, 가소성과 신경조절을 마음의 가장 단단한 물리적 바닥으로 봅니다.",
+      "color": "#2D9156",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Neural Substrate",
+        "description": "뇌라는 물리 시스템",
+        "repos": [
+          "neurons-neural-codes-distilled",
+          "brain-architecture-distilled",
+          "plasticity-learning-distilled",
+          "neuromodulation-arousal-distilled"
+        ]
+      }]
+    },
+    {
+      "id": "cognition",
+      "name": "Cognition",
+      "englishName": "L2 · COGNITIVE FUNCTIONS",
+      "description": "지각, 주의, 기억, 학습과 결정, 언어, 감정과 동기를 마음의 알고리즘 층에서 살펴봅니다.",
+      "color": "#3F74B9",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Cognition",
+        "description": "마음이 수행하는 핵심 알고리즘",
+        "repos": [
+          "perception-distilled",
+          "attention-working-memory-distilled",
+          "memory-distilled",
+          "learning-decision-distilled",
+          "language-concepts-distilled",
+          "emotion-motivation-distilled"
+        ]
+      }]
+    },
+    {
+      "id": "computational-mind",
+      "name": "The Computational Mind",
+      "englishName": "L3 · COMPUTATION & EMBODIMENT",
+      "description": "마음을 계산으로 보는 강력한 가설과 인공 신경망의 비교, 체화·행화 인지의 반론을 함께 봅니다.",
+      "color": "#4A5FC0",
+      "categories": [{
+        "id": "curriculum",
+        "name": "The Computational Mind",
+        "description": "마음은 계산인가라는 가설과 경계",
+        "repos": [
+          "computational-mind-distilled",
+          "brains-vs-networks-distilled",
+          "embodied-mind-distilled"
+        ]
+      }]
+    },
+    {
+      "id": "consciousness",
+      "name": "Consciousness",
+      "englishName": "L4 · EXPERIENCE & AWARENESS",
+      "description": "의식의 신경 상관물과 주요 이론, 어려운 문제, 변화된 상태를 통해 경험의 설명 가능성을 묻습니다.",
+      "color": "#7540C8",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Consciousness",
+        "description": "환원이 가장 거세게 저항하는 지점",
+        "repos": [
+          "hard-problem-distilled",
+          "ncc-distilled",
+          "theories-of-consciousness-distilled",
+          "altered-states-distilled"
+        ]
+      }]
+    },
+    {
+      "id": "the-self",
+      "name": "The Self",
+      "englishName": "L5 · SELF, AGENCY & MEANING",
+      "description": "자기 모델, 자유의지와 행위성, 타인의 마음, 의미와 죽음을 1인칭의 정점에서 다룹니다.",
+      "color": "#C83675",
+      "categories": [{
+        "id": "curriculum",
+        "name": "The Self",
+        "description": "경험하는 나 자신에 대한 탐구",
+        "repos": [
+          "self-model-distilled",
+          "free-will-agency-distilled",
+          "other-minds-distilled",
+          "meaning-mortality-distilled"
+        ]
+      }]
+    },
+    {
+      "id": "synthesis",
+      "name": "Synthesis",
+      "englishName": "L6 · CROSS-LAYER PRINCIPLES",
+      "description": "표상, 예측, 통합, 자기지시와 창발이 신경·인지·의식·자아의 여러 층에서 반복됨을 회수합니다.",
+      "color": "#9420A7",
+      "categories": [{
+        "id": "curriculum",
+        "name": "Synthesis",
+        "description": "레이어를 가로지르는 마음의 본질",
+        "repos": [
+          "representation-everywhere",
+          "prediction-everywhere",
+          "binding-integration-everywhere",
+          "strange-loop-everywhere",
+          "mind-emergence-distilled"
+        ]
+      }]
+    }
+  ]
+}
